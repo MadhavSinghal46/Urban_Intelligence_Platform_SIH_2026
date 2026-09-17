@@ -7,7 +7,7 @@ real-world observations collected through bus-mounted cameras and on-board AI
 detection into actionable information for authorized officials.
 
 The UI should communicate this journey:
-
+```
 Bus Camera
     ↓
 AI Detection
@@ -21,7 +21,7 @@ Officials Dashboard
 Issue Investigation
     ↓
 Actionable Decision
-
+```
 The interface should feel like a professional urban operations platform,
 not a generic analytics dashboard.
 
@@ -315,7 +315,7 @@ Where available in the prototype:
 - Similar nearby incidents
 
 Primary UX flow:
-
+```
 Detection
     ↓
 View Details
@@ -327,7 +327,7 @@ Location
 Context
     ↓
 Actionable Understanding
-
+```
 ---
 
 # 12. City Map
@@ -367,21 +367,21 @@ Design the component so a real map can be integrated later.
 The map and detection feed should feel connected.
 
 Preferred interaction:
-
+```
 User clicks detection
     ↓
 Issue details open
     ↓
 Map focuses on location
-
+```
 Or:
-
+```
 User selects map marker
     ↓
 Detection summary appears
     ↓
 View Details
-
+```
 This creates a strong geographic investigation experience.
 
 ---
@@ -480,7 +480,7 @@ Reduce columns while preserving map and detection visibility.
 ### Mobile
 
 Stack:
-
+```
 Overview
 ↓
 Detection Feed
@@ -490,7 +490,7 @@ Issue Details
 Map
 ↓
 Analytics
-
+```
 Controls should remain touch-friendly.
 
 ---
@@ -1079,26 +1079,26 @@ Suggested visual structure:
 
 ```text
 ┌──────────────────────────────────────────────────────┐
-│ CityPulse   Dashboard  Insights  Alerts  About      │
+│ CityPulse   Dashboard  Insights  Alerts  About       │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
-│ City Overview                         Date / Status │
+│ City Overview                         Date / Status  │
 │                                                      │
-│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────────┐ │
-│ │   AQI   │ │ Traffic │ │ Weather │ │   Alerts   │ │
-│ │   82    │ │Moderate │ │  29°C   │ │     03     │ │
-│ └─────────┘ └─────────┘ └─────────┘ └────────────┘ │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────────┐   │
+│ │   AQI   │ │ Traffic │ │ Weather │ │   Alerts   │   │
+│ │   82    │ │Moderate │ │  29°C   │ │     03     │   │
+│ └─────────┘ └─────────┘ └─────────┘ └────────────┘   │
 │                                                      │
-│ ┌──────────────────────────┐ ┌────────────────────┐ │
-│ │                          │ │                    │ │
-│ │         CITY MAP         │ │    AI INSIGHTS     │ │
-│ │                          │ │                    │ │
-│ └──────────────────────────┘ └────────────────────┘ │
+│ ┌──────────────────────────┐ ┌────────────────────┐  │
+│ │                          │ │                    │  │
+│ │         CITY MAP         │ │    AI INSIGHTS     │  │
+│ │                          │ │                    │  │
+│ └──────────────────────────┘ └────────────────────┘  │
 │                                                      │
-│ ┌──────────────────────────┐ ┌────────────────────┐ │
-│ │       CITY TRENDS        │ │   ACTIVE ALERTS    │ │
-│ │          Chart           │ │                    │ │
-│ └──────────────────────────┘ └────────────────────┘ │
+│ ┌──────────────────────────┐ ┌────────────────────┐  │
+│ │       CITY TRENDS        │ │   ACTIVE ALERTS    │  │
+│ │          Chart           │ │                    │  │
+│ └──────────────────────────┘ └────────────────────┘  │
 └──────────────────────────────────────────────────────┘
 ```
 
