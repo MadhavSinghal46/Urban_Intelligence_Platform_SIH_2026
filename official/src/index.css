@@ -192,9 +192,16 @@ h2 {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(22, 163, 74, 0.08);
   color: var(--text-primary);
   font-size: 0.82rem;
+}
+
+.status-indicator.online {
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.status-indicator.offline {
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .status-dot {
@@ -362,10 +369,31 @@ tbody tr:hover {
   cursor: pointer;
 }
 
-.empty-row {
+.empty-row,
+.loading-row,
+.empty-state,
+.loading-state,
+.error-state {
   text-align: center;
   color: var(--text-secondary);
   padding: 18px 10px;
+}
+
+.error-state {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+}
+
+.empty-state,
+.loading-state {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  background: rgba(15, 23, 42, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
 .map-preview, .map-page-container {

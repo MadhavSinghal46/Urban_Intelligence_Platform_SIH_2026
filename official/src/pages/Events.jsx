@@ -1,24 +1,72 @@
-import { useMemo, useState } from 'react'
-import { mockEvents, formatConfidence, getValidEvents } from '../data/mockData'
+import { useEffect, useMemo, useState } from 'react'
 import EventDetailsModal from '../components/events/EventDetailsModal'
+import { formatConfidence } from '../data/mockData'
+import { getEvents } from '../services/api'
 
 function EventsPage() {
-  const validEvents = useMemo(() => getValidEvents(mockEvents), [])
+  const [allEvents, setAllEvents] = useState([])
+  const [events, setEvents] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedDevice, setSelectedDevice] = useState('all')
   const [minConfidence, setMinConfidence] = useState(0)
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const deviceOptions = [...new Set(validEvents.map((event) => event.device_id))]
+  useEffect(() => {
+    let isMounted = true
 
-  const filteredEvents = validEvents.filter((event) => {
-    const matchesDevice = selectedDevice === 'all' || event.device_id === selectedDevice
-    const matchesConfidence = event.confidence >= minConfidence
-    const text = `${event.event_id} ${event.device_id}`.toLowerCase()
-    const matchesSearch = text.includes(searchTerm.trim().toLowerCase())
+    const loadEvents = async () => {
+      try {
+        setLoading(true)
+        setError('')
 
-    return matchesDevice && matchesConfidence && matchesSearch
-  })
+        const availableEvents = await getEvents({
+          deviceId: selectedDevice,
+          minConfidence,
+        })
+
+        if (!isMounted) return
+
+        const normalizedEvents = Array.isArray(availableEvents) ? availableEvents : []
+        setAllEvents(normalizedEvents)
+        setEvents(normalizedEvents)
+      } catch (loadError) {
+        if (!isMounted) return
+        setAllEvents([])
+        setEvents([])
+        setError(loadError.message || 'Unable to load event data.')
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadEvents()
+
+    return () => {
+      isMounted = false
+    }
+  }, [selectedDevice, minConfidence])
+
+  const deviceOptions = useMemo(
+    () => [...new Set(allEvents.map((event) => event.device_id))],
+    [allEvents],
+  )
+
+  const filteredEvents = useMemo(() => {
+    const searchValue = searchTerm.trim().toLowerCase()
+
+    if (!searchValue) {
+      return events
+    }
+
+    return events.filter((event) => {
+      const text = `${event.event_id} ${event.device_id}`.toLowerCase()
+      return text.includes(searchValue)
+    })
+  }, [events, searchTerm])
 
   return (
     <div className="page-stack">
@@ -28,6 +76,8 @@ function EventsPage() {
           <h1>Pothole events</h1>
         </div>
       </div>
+
+      {error && <div className="error-state">{error}</div>}
 
       <section className="panel filter-panel">
         <div className="filter-row">
@@ -79,9 +129,13 @@ function EventsPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredEvents.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan="6" className="empty-row">No events match the current filters.</td>
+                  <td colSpan="6" className="loading-row">Loading events...</td>
+                </tr>
+              ) : filteredEvents.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="empty-row">No events available.</td>
                 </tr>
               ) : (
                 filteredEvents.map((event) => (
