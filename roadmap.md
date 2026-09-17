@@ -2,7 +2,7 @@ CityPulse — Complete Project Roadmap
 
 1. Project Overview
 
-CityPulse is an AI-powered urban road and infrastructure monitoring system that uses cameras installed on public buses to automatically detect road-related issues while buses travel through the city.
+CityPulse is an AI-powered urban road and infrastructure monitoring system that uses cameras installed on public buses to automatically detect road-related issues while the buses travel through the city.
 
 The system has three main components:
 
