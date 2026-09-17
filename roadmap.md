@@ -1,1449 +1,575 @@
-# CityPulse — AI-Powered Urban Intelligence Platform
+CityPulse — Complete Project Roadmap
 
-> **Purpose:** Master development roadmap for AI coding agents such as GitHub Copilot, Cursor, Claude Code, etc.
->
-> **Current priority:** Build the frontend-first prototype. Backend, data processing, and AI/ML integrations will be connected progressively.
+1. Project Overview
 
----
+CityPulse is an AI-powered urban road and infrastructure monitoring system that uses cameras installed on public buses to automatically detect road-related issues while buses travel through the city.
 
-# 1. Project Overview
+The system has three main components:
 
-## What is CityPulse?
+1. On-Board AI System — detects issues using YOLO.
 
-**CityPulse** is an AI-powered urban intelligence platform designed to transform diverse city-level information into a simple, visual, and actionable interface.
 
-The platform collects/receives urban data, processes it through data-processing and AI/ML components, identifies important patterns or anomalies, and presents the results through an intuitive dashboard.
+2. Central Server — receives, stores, and processes detection data.
 
-The objective is to help users understand:
 
-- What is happening in the city?
-- Where is it happening?
-- Why might it be happening?
-- How serious is it?
-- What areas are affected?
-- What insights can be derived from the available data?
+3. Officials Web App — allows authorities to monitor and manage detected issues.
 
-CityPulse should ultimately function as a **central intelligence layer for urban information**.
+
+
+External applications can also access authorized CityPulse APIs.
+
 
 ---
 
-# 2. Core Product Vision
+2. System Architecture
 
-CityPulse should not feel like a collection of unrelated charts.
+CITYPULSE
+                       │
+        ┌──────────────┴──────────────┐
+        │                             │
+       BUS                      CENTRAL SERVER
+        │                             │
+     Camera                          API
+        ↓                             │
+   On-Board AI                       Database
+    (YOLO)                           Storage
+        ↓                             │
+ Detection Event                Data Processing
+        ↓                             │
+ GPS + Timestamp + Bus ID             │
+        ↓                             │
+   Local Queue                        │
+        │                             │
+        └──────── Internet ───────────┘
+                                      │
+                         ┌────────────┴────────────┐
+                         ↓                         ↓
+                 Officials Web App          External APIs
 
-The application should follow this flow:
 
-```text
-                 CITY DATA
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │   Data Processing   │
-          └──────────┬──────────┘
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │     AI / ML Layer   │
-          └──────────┬──────────┘
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │     CityPulse UI    │
-          └──────────┬──────────┘
-                     │
-          ┌──────────┼──────────┐
-          ▼          ▼          ▼
-       Dashboard   Map       Insights
-```
-
-The user should be able to move from:
-
-**Raw information → Visualization → AI insight → Actionable understanding**
 
 ---
 
-# 3. Development Philosophy
+3. On-Board AI System
 
-The project will be developed in phases.
+The bus acts as a mobile sensing platform.
 
-## Important rules for AI coding agents
+Workflow
 
-1. Do not build the entire application blindly in one step.
-2. Complete one development phase at a time.
-3. Inspect existing files before modifying them.
-4. Do not overwrite existing working code unnecessarily.
-5. Do not introduce unnecessary libraries.
-6. Keep frontend, backend, AI/ML, and data-processing logic modular.
-7. Use mock data until real APIs/data sources are connected.
-8. Design components so mock data can later be replaced with API data.
-9. Keep the application runnable after every major phase.
-10. Prioritize a polished working prototype over unnecessary features.
+Camera → YOLO → Detection → GPS + Timestamp + Bus ID
+                    ↓
+               Local Queue
+                    ↓
+               Central Server
 
----
+Responsibilities
 
-# 4. Technology Stack
+Capture road images/video
 
-## Frontend
+Detect road issues using YOLO
 
-- React.js
-- Vite
-- JavaScript
-- React Router
-- CSS / modern CSS architecture
+Generate detection events
 
-Optional libraries may be introduced later when required:
+Attach location and time information
 
-- Recharts — charts
-- Leaflet / React Leaflet — maps
-- Lucide React — icons
-- Axios — API requests
+Store evidence
 
-Do not install every library at the beginning.
+Queue events during internet failure
 
----
+Upload queued events when connectivity returns
 
-## Backend
 
-Later phase:
+Possible Detection Classes
 
-- Node.js
-- Express.js
-- REST APIs
+Potholes
+
+Road damage/cracks
+
+Obstructions
+
+Open manholes
+
+Other infrastructure issues
+
+
+Technology: Python, YOLO, OpenCV, GPS, Edge Device.
+
 
 ---
 
-## AI / ML
+4. Central Server & Backend
 
-Python-based AI/ML services may be introduced when required.
+The Central Server is the core communication and data layer of CityPulse.
 
-Potential technologies:
+Responsibilities
 
-- Python
-- FastAPI
-- Pandas
-- NumPy
-- Scikit-learn
-- Other ML libraries depending on the final model
+Receive detection events from buses
 
-The AI/ML layer should remain independent from the React frontend.
+Authenticate and validate devices
 
----
+Store detection data
 
-## Database
+Store evidence images/videos
 
-Potential:
+Process and aggregate detections
 
-- MongoDB
+Provide analytics
 
-The exact database structure should be finalized when backend development begins.
+Manage maintenance information
 
----
+Provide APIs to frontend and external applications
 
-# 5. Application Architecture
 
-Target architecture:
+Main Data
 
-```text
-CityPulse/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── layouts/
-│   │   ├── data/
-│   │   ├── services/
-│   │   ├── hooks/
-│   │   ├── utils/
-│   │   ├── assets/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
-│
-├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── services/
-│   ├── middleware/
-│   ├── utils/
-│   └── server.js
-│
-├── ai/
-│   ├── models/
-│   ├── services/
-│   ├── preprocessing/
-│   ├── prediction/
-│   └── main.py
-│
-└── README.md
-```
+Detection
 
-**Do not create all folders immediately.**
+ID
 
-Create folders only when the corresponding development phase begins.
+Type
+
+Severity
+
+AI confidence
+
+Location
+
+Timestamp
+
+Bus ID
+
+Evidence
+
+Status
+
+
+Maintenance
+
+Assigned team
+
+Status
+
+Notes
+
+Action taken
+
+Resolution date
+
+
+Technology: Node.js, Express.js, MongoDB/MongoDB Atlas.
+
 
 ---
 
-# 6. Frontend Product Structure
+5. Officials Web App
 
-The frontend should contain these major sections.
+The web application is the main interface for city officials.
 
-## Public Pages
+Main Sections
 
-### 1. Landing Page
-
-Route:
-
-```text
-/
-```
-
-Purpose:
-
-Introduce CityPulse and communicate the problem and solution.
-
-Sections:
-
-- Navbar
-- Hero section
-- CityPulse introduction
-- Core capabilities
-- How CityPulse works
-- AI/ML intelligence section
-- Urban data visualization preview
-- Call to action
-- Footer
-
-Primary CTA:
-
-```text
-Explore CityPulse
-```
-
----
-
-# 7. Dashboard
-
-Route:
-
-```text
-/dashboard
-```
-
-This is the primary application interface.
-
-## Dashboard structure
-
-### Header
-
-Display:
-
-- City/location
-- Current date/time
-- Dashboard title
-- Notification/alert indicator
-- User/profile area if authentication is introduced later
-
----
-
-## Overall City Status
-
-Create a prominent summary section.
-
-Example:
-
-```text
-CITY STATUS
-
-Overall Status
-● Stable
-
-Air Quality
-Good
-
-Traffic
-Moderate
-
-Weather
-Clear
-
-Active Alerts
-03
-```
-
-All values should initially come from mock data.
-
----
-
-# 8. Urban Indicator Cards
-
-Create reusable cards for major indicators.
-
-Initial indicators:
-
-### Air Quality
-
-Display:
-
-- AQI
-- AQI category
-- Trend
-- Last updated
-
-Example:
-
-```text
-AQI
-82
-Moderate
-↑ 6% from yesterday
-```
-
----
-
-### Traffic
-
-Display:
-
-- Current traffic condition
-- Congestion level
-- Trend
-- Affected areas
-
----
-
-### Weather
-
-Display:
-
-- Temperature
-- Condition
-- Humidity
-- Wind
-- Weather alert if applicable
-
----
-
-### Active Alerts
-
-Display:
-
-- Number of active alerts
-- Severity
-- Location
-- Time
-
----
-
-# 9. City Map
-
-The dashboard should contain a large map visualization.
-
-Initially:
-
-Use a placeholder or static map component.
-
-Later:
-
-Integrate:
-
-- Leaflet / OpenStreetMap or another suitable map solution
-- Location markers
-- Alert markers
-- Pollution zones
-- Traffic zones
-- Infrastructure issues
-- Other relevant urban events
-
-Possible marker categories:
-
-```text
-Traffic
-Pollution
-Weather
-Infrastructure
-Public Safety
-Other
-```
-
-Use different visual indicators for different categories.
-
----
-
-# 10. Data Visualization
-
-The dashboard should contain charts that make city trends understandable.
-
-Possible charts:
-
-### Time-series chart
-
-Examples:
-
-- AQI over time
-- Traffic over time
-- Temperature over time
-
-### Bar chart
-
-Examples:
-
-- Area-wise pollution
-- Area-wise traffic
-- Number of incidents
-
-### Distribution chart
-
-Examples:
-
-- Alert categories
-- Severity distribution
-
-### Trend indicators
-
-Show:
-
-```text
-↑ Increasing
-↓ Decreasing
-→ Stable
-```
-
-Charts must use reusable data structures.
-
----
-
-# 11. AI Insights
-
-Route:
-
-```text
-/insights
-```
-
-This section presents insights generated by the AI/ML layer.
-
-Initially use mock AI-generated insights.
-
-Example:
-
-```text
-Traffic Insight
-
-Traffic congestion has increased
-in the central zone during evening
-hours compared with the previous period.
-
-Severity: Medium
-Confidence: 87%
-```
-
----
-
-## Insight categories
-
-Initial categories:
-
-- Traffic
-- Air Quality
-- Weather
-- Infrastructure
-- Public Safety
-- General Urban Trends
-
----
-
-## Insight Card
-
-Every insight should contain:
-
-- Category
-- Title
-- Description
-- Severity
-- Confidence
-- Location
-- Timestamp
-- Relevant metric
-- View details
-
----
-
-# 12. Insight Details
-
-When the user clicks an insight:
-
-Display:
-
-- Full explanation
-- Affected location
-- Relevant metrics
-- Historical comparison
-- Possible contributing factors
-- AI confidence
-- Related alerts
-- Map location
-
-Example flow:
-
-```text
-Insight
-   ↓
-View Details
-   ↓
-Detailed Explanation
-   ↓
-Supporting Data
-   ↓
-Location on Map
-```
-
----
-
-# 13. Alerts System
-
-Create a dedicated alerts interface.
-
-Alerts should have:
-
-- Title
-- Category
-- Severity
-- Location
-- Description
-- Timestamp
-- Status
-
-Severity levels:
-
-```text
-Low
-Medium
-High
-Critical
-```
-
-Initially, alerts are mock data.
-
-Later they can be generated dynamically from backend/AI results.
-
----
-
-# 14. Historical Analysis
-
-CityPulse should eventually allow users to understand changes over time.
-
-Possible controls:
-
-```text
-Today
-7 Days
-30 Days
-Custom Range
-```
-
-Users should be able to compare:
-
-- Current vs previous period
-- Area vs area
-- Indicator vs indicator
-
-This feature can initially use mock historical data.
-
----
-
-# 15. About Page
-
-Route:
-
-```text
-/about
-```
-
-Sections:
-
-### About CityPulse
-
-Explain the platform.
-
-### Problem
-
-Explain the challenge of fragmented urban information.
-
-### Solution
-
-Explain how CityPulse combines data processing, visualization, and AI.
-
-### How It Works
-
-```text
-Data
- ↓
-Processing
- ↓
-AI/ML
- ↓
-Insights
- ↓
-Visualization
-```
-
-### Technology
-
-Display the technologies used by the project.
-
-### Team
-
-Add project team information later.
-
----
-
-# 16. Navigation
-
-Primary navigation:
-
-```text
-CityPulse
-
+Login
 Dashboard
-Insights
-Alerts
-About
-```
-
-Optional later:
-
-```text
+Detections
+Detection Details
+Interactive Map
 Analytics
-Settings
-Profile
-```
+Maintenance
+Reports
 
-Do not add unnecessary navigation items during the initial prototype.
-
----
-
-# 17. Design System
-
-CityPulse should have a consistent visual identity.
-
-## Design characteristics
-
-- Modern
-- Professional
-- Data-driven
-- Urban
-- Clean
-- Minimal
-- Accessible
-- Responsive
-
-Avoid:
-
-- Excessive gradients
-- Excessive animations
-- Huge decorative elements
-- Unnecessary glassmorphism
-- Cluttered dashboards
-- Generic template appearance
-
----
-
-# 18. Reusable Components
-
-Create reusable components when needed.
-
-Initial components:
-
-```text
-Navbar
-Footer
-Button
-Card
-StatCard
-MetricCard
-AlertCard
-InsightCard
-ChartCard
-MapContainer
-Badge
-StatusIndicator
-SectionHeader
-```
-
-Components should accept props instead of duplicating markup.
-
-Example:
-
-```jsx
-<StatCard
-  title="Air Quality"
-  value="82"
-  status="Moderate"
-  trend="+6%"
-/>
-```
-
----
-
-# 19. Mock Data Architecture
-
-During frontend development, use structured mock data.
-
-Example:
-
-```javascript
-const cityStats = {
-  airQuality: {
-    value: 82,
-    status: "Moderate",
-    trend: 6
-  },
-
-  traffic: {
-    status: "Moderate",
-    congestion: 61,
-    trend: 4
-  },
-
-  weather: {
-    temperature: 29,
-    condition: "Clear"
-  }
-};
-```
-
-Do not scatter fake values throughout JSX.
-
-This will make future API integration easier.
-
----
-
-# 20. Frontend Data Flow
-
-Initial:
-
-```text
-Mock Data
-     ↓
-React Components
-     ↓
 Dashboard
-```
 
-Later:
+Display:
 
-```text
-Backend API
-     ↓
-Axios / Fetch
-     ↓
-React Services
-     ↓
-State
-     ↓
-Components
-```
+Total detections
 
-Eventually:
+Active issues
 
-```text
-Data Sources
-     ↓
-Backend
-     ↓
-AI/ML Processing
-     ↓
-API
-     ↓
-Frontend
-     ↓
-Dashboard / Map / Insights
-```
+High/Critical issues
 
----
+Resolved issues
 
-# 21. Backend Phase
+Recent detections
 
-After the frontend prototype is stable, create the backend.
+Priority issues
 
-Responsibilities:
+Detection trends
 
-- API endpoints
-- Data processing
-- Database communication
-- AI/ML communication
-- Alert generation
-- Insight management
+Map preview
 
-Example API structure:
 
-```text
-GET /api/city/overview
-GET /api/city/indicators
-GET /api/alerts
-GET /api/insights
-GET /api/traffic
-GET /api/air-quality
-GET /api/weather
-```
+Detection Management
 
-The exact endpoints can be finalized during implementation.
+Officials can:
 
----
+View detections
 
-# 22. Database Phase
+Search and filter issues
 
-When backend development begins, create models for relevant entities.
+View evidence
 
-Potential collections:
+Check AI confidence
 
-```text
-users
-cityData
-alerts
-insights
-locations
-historicalData
-```
+View severity
 
-Do not create unnecessary database models.
+View exact location
 
----
+View bus and timestamp information
 
-# 23. AI/ML Phase
 
-The AI/ML system should not simply be a chatbot.
+Interactive Map
 
-It should provide meaningful urban intelligence.
+Display detection markers
 
-Potential capabilities:
+Show issue type and severity
 
-### Anomaly Detection
+Filter markers
 
-Identify unusual changes in:
+Open detection details from the map
 
-- Traffic
-- AQI
-- Weather
-- Other urban indicators
+
+Analytics
+
+Detection trends
+
+Issue categories
+
+Severity distribution
+
+Area-wise detections
+
+Open vs resolved
+
+Repeated problem locations
+
+
+Maintenance
+
+Issue lifecycle:
+
+Detected → Open → Assigned → In Progress → Resolved
+
+Officials can track assignments, status, actions, and resolution.
+
+Reports
+
+Generate filtered summaries based on:
+
+Date
+
+Area
+
+Issue type
+
+Severity
+
+Status
+
+
+PDF/CSV export can be added later.
+
+Technology: React.js, Vite, React Router, Axios, Leaflet, Recharts.
+
 
 ---
 
-### Trend Detection
+6. API Layer
 
-Identify patterns such as:
+The Central Server will expose APIs for the frontend and authorized external applications.
 
-```text
-Traffic consistently increases
-between 6 PM and 8 PM.
-```
+Example APIs
 
----
+GET    /api/detections
+GET    /api/detections/:id
+GET    /api/analytics
+GET    /api/locations
+GET    /api/alerts
 
-### Risk Classification
+PATCH  /api/detections/:id/status
+PATCH  /api/detections/:id/assignment
 
-Classify detected situations:
+The final API structure will be decided during backend development.
 
-```text
-Low
-Medium
-High
-Critical
-```
 
 ---
 
-### Predictive Analysis
+7. Complete Data Flow
 
-Where sufficient data exists, predict possible future trends.
+Bus Camera
+    ↓
+YOLO Detection
+    ↓
+Detection Event
+    ↓
+GPS + Timestamp + Bus ID
+    ↓
+Local Queue
+    ↓
+Internet
+    ↓
+Central API
+    ↓
+Database + Evidence Storage
+    ↓
+Processing & Analytics
+    ↓
+Officials Web App
+    ↓
+Monitoring → Maintenance → Resolution
 
-Example:
-
-```text
-Expected traffic congestion
-during evening hours.
-```
-
----
-
-### AI Insight Generation
-
-Convert processed data into understandable explanations.
-
-Example:
-
-```text
-Traffic congestion in Zone A increased
-by 18% compared with the previous week.
-The increase is concentrated between
-6 PM and 8 PM.
-```
-
-AI-generated explanations must be grounded in available data.
-
-Do not allow the AI to invent statistics.
 
 ---
 
-# 24. AI Service Architecture
+8. Development Phases
 
-Potential architecture:
+Phase 1 — Project Setup
 
-```text
-Backend
-   │
-   ├── Data
-   │
-   └── AI Service
-          │
-          ├── Preprocessing
-          ├── ML Model
-          ├── Anomaly Detection
-          ├── Prediction
-          └── Insight Generation
-```
+GitHub repository
 
-If Python is required:
+Project architecture
 
-```text
-Node/Express Backend
-        │
-        ▼
-Python AI Service
-        │
-        ▼
-Prediction / Analysis
-        │
-        ▼
-Backend API
-        │
-        ▼
-React Frontend
-```
+Technology setup
 
----
+Folder structure
 
-# 25. API Integration Phase
+API planning
 
-Replace mock data progressively.
+Team responsibilities
 
-Do NOT replace the entire frontend at once.
 
-Recommended order:
+Phase 2 — On-Board AI Prototype
 
-```text
-1. City overview
-2. Indicators
-3. Alerts
-4. Historical data
-5. Map data
-6. AI insights
-7. Predictions
-```
+Camera/video input
 
-Every integration should be tested before moving to the next one.
+YOLO model
 
----
+Detection classes
 
-# 26. Loading & Error States
+Confidence score
 
-Every API-driven component must eventually handle:
+Detection event generation
 
-### Loading
+GPS/location integration
 
-```text
-Loading city data...
-```
+Local queue
 
-### Error
 
-```text
-Unable to load city data.
-Try again.
-```
+Phase 3 — Central Backend
 
-### Empty
+Node.js + Express setup
 
-```text
-No active alerts found.
-```
+Database connection
 
-Never leave blank screens when data is unavailable.
+API development
 
----
+Authentication
 
-# 27. Responsive Design
+Detection storage
 
-The application must work on:
+Evidence storage
 
-- Desktop
-- Laptop
-- Tablet
-- Mobile
+Analytics processing
 
-Dashboard behavior:
+Maintenance APIs
 
-Desktop:
 
-```text
-[ Card ][ Card ][ Card ][ Card ]
+Phase 4 — Officials Web App
 
-[       Map        ][ Insights ]
+Login
 
-[      Charts      ][ Alerts   ]
-```
+Dashboard
 
-Mobile:
+Detection management
 
-```text
-[ Card ]
+Detection details
 
-[ Card ]
+Interactive map
 
-[ Card ]
+Analytics
 
-[ Map ]
+Maintenance
 
-[ Insights ]
+Reports
 
-[ Charts ]
 
-[ Alerts ]
-```
-
----
-
-# 28. Accessibility
-
-Implement:
-
-- Semantic HTML
-- Accessible buttons
-- Proper labels
-- Keyboard navigation
-- Sufficient contrast
-- Meaningful alt text
-- Visible focus states
-
-Do not rely only on color to communicate severity.
-
----
-
-# 29. Performance
-
-Keep the prototype lightweight.
-
-Avoid:
-
-- Unnecessary dependencies
-- Huge images
-- Excessive animations
-- Repeated API calls
-- Unnecessary re-renders
-
-Optimize map and chart rendering when required.
-
----
-
-# 30. Security
-
-When backend development begins:
-
-- Never expose API keys in frontend code.
-- Use environment variables.
-- Validate API input.
-- Sanitize user-controlled data.
-- Use proper authentication if authentication is required.
-- Never commit `.env` files containing secrets.
-
----
-
-# 31. Development Phases
-
-## Phase 1 — Project Initialization
-
-Tasks:
-
-- [ ] Initialize React + Vite
-- [ ] Configure basic project
-- [ ] Run development server
-- [ ] Establish Git repository workflow
-
----
-
-## Phase 2 — Frontend Foundation
-
-Tasks:
-
-- [ ] Navbar
-- [ ] Footer
-- [ ] Routing
-- [ ] Global styling
-- [ ] Design system
-- [ ] Responsive layout
-
----
-
-## Phase 3 — Landing Page
-
-Tasks:
-
-- [ ] Hero
-- [ ] Introduction
-- [ ] Features
-- [ ] How it works
-- [ ] CTA
-- [ ] Footer
-
----
-
-## Phase 4 — Dashboard UI
-
-Tasks:
-
-- [ ] Dashboard layout
-- [ ] City overview
-- [ ] Indicator cards
-- [ ] Alerts
-- [ ] Insights
-- [ ] Charts
-- [ ] Map placeholder
-- [ ] Mock data
-
----
-
-## Phase 5 — Insights & Alerts
-
-Tasks:
-
-- [ ] Insights page
-- [ ] Insight cards
-- [ ] Insight details
-- [ ] Alerts page
-- [ ] Severity indicators
-- [ ] Filtering
-
----
-
-## Phase 6 — Map
-
-Tasks:
-
-- [ ] Map library
-- [ ] City location
-- [ ] Markers
-- [ ] Categories
-- [ ] Popup/details
-- [ ] Basic filtering
-
----
-
-## Phase 7 — Historical Analytics
-
-Tasks:
-
-- [ ] Time ranges
-- [ ] Historical charts
-- [ ] Comparisons
-- [ ] Trend indicators
-
----
-
-## Phase 8 — Backend
-
-Tasks:
-
-- [ ] Express server
-- [ ] API routes
-- [ ] Controllers
-- [ ] Services
-- [ ] Database connection
-- [ ] Data models
-
----
-
-## Phase 9 — Data Integration
-
-Connect appropriate city data sources.
-
-Potential categories:
-
-```text
-Weather
-Air Quality
-Traffic
-Infrastructure
-Public Safety
-Other relevant datasets
-```
-
-Only integrate data sources that are actually available and appropriate for the prototype.
-
----
-
-## Phase 10 — AI/ML
-
-Implement:
-
-- [ ] Data preprocessing
-- [ ] Anomaly detection
-- [ ] Trend analysis
-- [ ] Classification
-- [ ] Prediction where feasible
-- [ ] AI insight generation
-
----
-
-## Phase 11 — Full Integration
+Phase 5 — System Integration
 
 Connect:
 
-```text
-Frontend
-   ↕
-Backend
-   ↕
+On-Board AI
+     ↓
+Central Backend
+     ↓
 Database
-   ↕
-AI/ML
-   ↕
-Data Sources
-```
+     ↓
+Officials Web App
 
-Replace remaining mock data.
+Replace frontend mock data with real API data.
 
----
+Phase 6 — Testing & Final Prototype
 
-## Phase 12 — Testing
+AI detection testing
 
-### Frontend
+API testing
 
-- [ ] Navigation
-- [ ] Responsive layout
-- [ ] Components
-- [ ] Forms
-- [ ] Charts
-- [ ] Maps
+Database testing
 
-### Backend
+Offline/queue testing
 
-- [ ] API responses
-- [ ] Validation
-- [ ] Error handling
+Frontend testing
 
-### AI
+End-to-end testing
 
-- [ ] Model outputs
-- [ ] Invalid inputs
-- [ ] Edge cases
-- [ ] Prediction behavior
+Final demonstration
 
-### Integration
 
-- [ ] Frontend ↔ Backend
-- [ ] Backend ↔ Database
-- [ ] Backend ↔ AI
 
 ---
 
-# 32. Prototype Priority
+9. MVP Scope
 
-For the SIH prototype, prioritize a strong end-to-end demonstration.
+For the initial SIH prototype, focus on a working end-to-end flow.
 
-The minimum convincing flow should be:
+On-Board System
 
-```text
-Landing Page
-      ↓
+Camera/video input
+
+YOLO detection
+
+Detection event
+
+Location
+
+Timestamp
+
+Bus ID
+
+
+Backend
+
+REST API
+
+Database
+
+Detection storage
+
+Evidence storage
+
+
+Officials App
+
+Login
+
 Dashboard
-      ↓
-City Data
-      ↓
-Map / Visualization
-      ↓
-Detected Issue
-      ↓
-AI Insight
-      ↓
-Detailed Explanation
-```
 
-The prototype should demonstrate the **complete concept**, even if some data sources are mocked or limited.
+Detection list/details
 
----
+Interactive map
 
-# 33. MVP Feature Set
+Evidence
 
-- [ ] Professional landing page
-- [ ] Responsive dashboard
-- [ ] City overview
-- [ ] Air quality indicator
-- [ ] Traffic indicator
-- [ ] Weather indicator
-- [ ] Active alerts
-- [ ] City map
-- [ ] Charts
-- [ ] AI insights page
-- [ ] Insight details
-- [ ] Historical visualization
-- [ ] About page
-- [ ] Mock data architecture
-- [ ] API-ready frontend architecture
+Severity & confidence
+
+Basic analytics
+
+Maintenance status
+
+
+Core Demo
+
+Camera → YOLO → Detection Event → Central Server
+        → Database → Officials Dashboard → Map/Analytics
+
 
 ---
 
-# 34. Future Features
+10. Future Scope
 
-These should NOT be implemented until the core prototype is stable.
+After the MVP, CityPulse can be expanded with:
 
-Potential future features:
+Repeated/duplicate detection identification
 
-- User authentication
-- Personalized dashboards
-- Notifications
-- Real-time updates
-- Advanced prediction
-- Multiple city comparison
-- Citizen reporting
-- Admin dashboard
-- Government/authority dashboard
-- Mobile application
-- Multilingual interface
-- Voice-based interaction
-- Advanced AI assistant
-- Automated recommendations
+Road-condition hotspots
 
----
+Predictive maintenance
 
-# 35. Coding Agent Rules
+Advanced geospatial analytics
 
-When working on this project, the AI coding agent must follow these rules:
+Real-time monitoring
 
-### Rule 1
-Always inspect the current project before modifying it.
+Multi-city support
 
-### Rule 2
-Implement only the requested phase.
+Mobile application
 
-### Rule 3
-Do not build backend functionality while working on frontend unless explicitly requested.
+Smart-city platform integration
 
-### Rule 4
-Do not create fake APIs and pretend they are real.
+Public reporting integration
 
-### Rule 5
-Use mock data explicitly when real data is unavailable.
+Advanced AI-based severity assessment
 
-### Rule 6
-Keep code modular and reusable.
 
-### Rule 7
-Do not unnecessarily rewrite existing components.
-
-### Rule 8
-Do not install packages without explaining why they are required.
-
-### Rule 9
-After implementation, verify that the application runs.
-
-### Rule 10
-Report:
-
-```text
-Files created
-Files modified
-Dependencies added
-Features implemented
-Known issues
-Next recommended step
-```
 
 ---
 
-# 36. Current Development Instruction
+11. Project Boundaries
 
-## CURRENT PHASE: FRONTEND
+On-Board AI Team
 
-The project is currently in the frontend development phase.
+Responsible for:
 
-The immediate objective is:
+Camera
 
-```text
-Build a polished CityPulse frontend
-using React + Vite.
-```
+YOLO
 
-Start with:
+Edge AI
 
-```text
-1. React/Vite foundation
-2. Routing
-3. Global styling
-4. Navbar
-5. Landing page
-6. Dashboard
-7. Insights
-8. Alerts
-9. Map placeholder
-10. Responsive design
-```
+GPS
 
-Use mock data.
+Local queue
 
-Do not implement:
+Detection events
 
-```text
-Backend
+
+Backend Team
+
+Responsible for:
+
+Server
+
+APIs
+
 Database
+
+Storage
+
+Processing
+
 Authentication
-AI/ML model
-Real APIs
-Real-time processing
-```
 
-until explicitly instructed.
 
----
+Frontend Team
 
-# 37. Definition of Done
+Responsible for:
 
-A phase is considered complete only when:
+Officials Web App
 
-- The application runs without errors.
-- The requested functionality works.
-- Navigation works.
-- UI is responsive.
-- Console has no avoidable errors.
-- Components are reasonably reusable.
-- Existing functionality has not been broken.
-- The code is organized for the next development phase.
+Dashboard
+
+Map
+
+Analytics
+
+Maintenance
+
+Reports
+
+
 
 ---
 
-# 38. Final Product Vision
+12. Final Vision
 
-The final CityPulse experience should communicate:
+CityPulse transforms public buses into mobile AI-powered road monitoring units.
 
-> **One platform. One city view. Intelligent insights from complex urban data.**
+It continuously collects road-condition information, sends structured detection events to a central platform, and provides authorities with the information needed to understand:
 
-The user should be able to open CityPulse and immediately understand:
-
-```text
-WHAT is happening?
-        ↓
-WHERE is it happening?
-        ↓
-HOW SERIOUS is it?
-        ↓
-WHAT PATTERN is visible?
-        ↓
-WHAT does the AI infer?
-```
-
-CityPulse should ultimately combine:
-
-**Data + Maps + Analytics + AI/ML + Visualization**
-
-into one coherent urban intelligence platform.
+What was detected → Where → How severe → Evidence → Current status → Action taken → Resolution.
