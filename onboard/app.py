@@ -53,7 +53,7 @@ def main():
             break
 
         frame_count += 1
-
+        gps.update()
         detections = detector.detect(frame)
 
         detection_count += len(detections)
