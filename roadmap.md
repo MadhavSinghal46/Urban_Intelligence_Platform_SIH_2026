@@ -6,7 +6,7 @@ CityPulse is an AI-powered urban road and infrastructure monitoring system that 
 
 The system has three main components:
 
-1. On-Board AI System — detects issues using YOLO.
+1. On-Board AI system — detects issues using YOLO.
 
 
 2. Central Server — receives, stores, and processes detection data.
