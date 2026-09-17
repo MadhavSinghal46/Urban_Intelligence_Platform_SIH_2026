@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+import json
+
+from fastapi import FastAPI, HTTPException, Query
 
 from models import PotholeEvent
 from database import ServerDatabase
@@ -37,10 +39,18 @@ def event_count():
         "count": database.count_events()
     }
 
-@app.get("/events")
-def get_events():
 
-    cursor = database.connection.execute("""
+@app.get("/events")
+def get_events(
+    device_id: str | None = Query(default=None),
+    min_confidence: float | None = Query(
+        default=None,
+        ge=0.0,
+        le=1.0
+    )
+):
+
+    query = """
         SELECT
             event_id,
             device_id,
@@ -50,8 +60,28 @@ def get_events():
             latitude,
             longitude
         FROM pothole_events
-        ORDER BY timestamp DESC
-    """)
+    """
+
+    conditions = []
+    parameters = []
+
+    if device_id is not None:
+        conditions.append("device_id = ?")
+        parameters.append(device_id)
+
+    if min_confidence is not None:
+        conditions.append("confidence >= ?")
+        parameters.append(min_confidence)
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " ORDER BY timestamp DESC"
+
+    cursor = database.connection.execute(
+        query,
+        parameters
+    )
 
     rows = cursor.fetchall()
 
@@ -63,7 +93,7 @@ def get_events():
             "device_id": row[1],
             "timestamp": row[2],
             "confidence": row[3],
-            "bbox": row[4],
+            "bbox": json.loads(row[4]),
             "latitude": row[5],
             "longitude": row[6]
         })
@@ -71,4 +101,39 @@ def get_events():
     return {
         "count": len(events),
         "events": events
+    }
+
+
+@app.get("/events/{event_id}")
+def get_event(event_id: str):
+
+    cursor = database.connection.execute("""
+        SELECT
+            event_id,
+            device_id,
+            timestamp,
+            confidence,
+            bbox,
+            latitude,
+            longitude
+        FROM pothole_events
+        WHERE event_id = ?
+    """, (event_id,))
+
+    row = cursor.fetchone()
+
+    if row is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Event not found"
+        )
+
+    return {
+        "event_id": row[0],
+        "device_id": row[1],
+        "timestamp": row[2],
+        "confidence": row[3],
+        "bbox": json.loads(row[4]),
+        "latitude": row[5],
+        "longitude": row[6]
     }
