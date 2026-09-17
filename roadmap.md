@@ -22,7 +22,7 @@ External applications can also access authorized CityPulse APIs.
 ---
 
 2. System Architecture
-
+```
 CITYPULSE
                        │
         ┌──────────────┴──────────────┐
@@ -46,7 +46,7 @@ CITYPULSE
                          ↓                         ↓
                  Officials Web App          External APIs
 
-
+```
 
 ---
 
@@ -55,13 +55,13 @@ CITYPULSE
 The bus acts as a mobile sensing platform.
 
 Workflow
-
+```
 Camera → YOLO → Detection → GPS + Timestamp + Bus ID
                     ↓
                Local Queue
                     ↓
                Central Server
-
+```
 Responsibilities
 
 Capture road images/video
@@ -293,7 +293,7 @@ The final API structure will be decided during backend development.
 ---
 
 7. Complete Data Flow
-
+```
 Bus Camera
     ↓
 YOLO Detection
@@ -315,7 +315,7 @@ Processing & Analytics
 Officials Web App
     ↓
 Monitoring → Maintenance → Resolution
-
+```
 
 ---
 
@@ -394,7 +394,7 @@ Reports
 Phase 5 — System Integration
 
 Connect:
-
+```
 On-Board AI
      ↓
 Central Backend
@@ -402,7 +402,7 @@ Central Backend
 Database
      ↓
 Officials Web App
-
+```
 Replace frontend mock data with real API data.
 
 Phase 6 — Testing & Final Prototype
@@ -475,10 +475,10 @@ Maintenance status
 
 
 Core Demo
-
+```
 Camera → YOLO → Detection Event → Central Server
         → Database → Officials Dashboard → Map/Analytics
-
+```
 
 ---
 
@@ -571,5 +571,6 @@ Reports
 CityPulse transforms public buses into mobile AI-powered road monitoring units.
 
 It continuously collects road-condition information, sends structured detection events to a central platform, and provides authorities with the information needed to understand:
-
+```
 What was detected → Where → How severe → Evidence → Current status → Action taken → Resolution.
+```
