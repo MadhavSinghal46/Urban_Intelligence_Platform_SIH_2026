@@ -2,10 +2,12 @@ import requests
 
 
 class EventUploader:
+
     def __init__(self, server_url: str):
         self.server_url = server_url.rstrip("/")
 
     def upload_event(self, event):
+
         try:
             response = requests.post(
                 f"{self.server_url}/events",
@@ -19,10 +21,15 @@ class EventUploader:
             print(
                 f"Upload failed: HTTP {response.status_code}"
             )
+
             return False
 
         except requests.RequestException as error:
-            print(f"Server unavailable: {error}")
+
+            print(
+                f"Server unavailable: {error}"
+            )
+
             return False
 
     def upload_pending_events(self, database):
@@ -39,6 +46,7 @@ class EventUploader:
             success = self.upload_event(event)
 
             if success:
+
                 database.mark_uploaded(
                     event["event_id"]
                 )
@@ -49,5 +57,10 @@ class EventUploader:
                     f"UPLOADED EVENT | "
                     f"{event['event_id']}"
                 )
+
+            else:
+                # Stop trying the remaining events if
+                # the server is currently unavailable.
+                break
 
         return uploaded_count
