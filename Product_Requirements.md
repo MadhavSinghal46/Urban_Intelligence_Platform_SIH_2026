@@ -140,21 +140,32 @@ Citizen Feedback
 ## 8. MVP Priority
 
 ### Must Have
-- Authentication
-- Issue reporting
-- Image + location
-- AI classification/severity
-- Issue tracking
-- Authority dashboard
-- Status updates
-- Basic analytics/map
+```
+Citizen
+   ↓
+Report Civic Issue
+   ↓
+AI Analysis
+   ↓
+Severity + Priority
+   ↓
+Authority Dashboard
+   ↓
+Verify & Assign
+   ↓
+Update Status
+   ↓
+Resolved
+```
 
 ### Later
-- Notifications
-- Advanced AI
-- Sophisticated hotspot prediction
-- Government integrations
-- Mobile app
+-Advanced notifications
+-SMS/email integration
+-Complex ML model training
+-Government API integration
+-Mobile application
+-Advanced predictive analytics
+-Large-scale GIS functionality
 
 ---
 
