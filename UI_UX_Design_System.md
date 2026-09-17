@@ -1,104 +1,606 @@
-# CityPulse — UI/UX Design System & Implementation Plan
+# CityPulse — UI/UX Roadmap
 
-## Purpose
+## 1. UI/UX Vision
 
-This document defines the visual design system and UI/UX implementation standards for the CityPulse frontend.
+CityPulse is an urban intelligence and incident-monitoring platform that converts
+real-world observations collected through bus-mounted cameras and on-board AI
+detection into actionable information for authorized officials.
 
-CityPulse is an AI-powered urban intelligence platform that combines city data, maps, analytics, alerts, and AI-generated insights into one coherent interface.
+The UI should communicate this journey:
 
-The goal is to make the frontend feel:
+Bus Camera
+    ↓
+AI Detection
+    ↓
+Detection Event
+    ↓
+Central Intelligence
+    ↓
+Officials Dashboard
+    ↓
+Issue Investigation
+    ↓
+Actionable Decision
 
-- Modern
-- Professional
-- Urban
-- Data-driven
-- Intelligent
-- Clean
-- Minimal
-- Trustworthy
-- Accessible
-- Responsive
-- Premium without being flashy
-
-This file is intended to be given to an AI coding agent such as GitHub Copilot, Cursor, Claude Code, or another AI code editor.
-
----
-
-# 1. IMPORTANT AI CODING AGENT RULES
-
-Before making any changes:
-
-1. Inspect the existing project structure.
-2. Inspect the current frontend and styling architecture.
-3. Identify existing reusable components.
-4. Identify existing routes/pages.
-5. Identify what is already functional.
-6. Preserve existing working functionality.
-7. Do not blindly rewrite the application.
-8. Do not introduce unnecessary dependencies.
-9. Do not modify backend functionality.
-10. Keep the application runnable after implementation.
-
-This is a UI/UX refinement and design-system implementation task.
-
-DO NOT implement:
-
-- Backend functionality
-- Database functionality
-- Authentication
-- Real APIs
-- AI/ML models
-- Real-time processing
-
-unless these already exist and a UI change requires preserving them.
-
-Use existing mock data and functionality where available.
+The interface should feel like a professional urban operations platform,
+not a generic analytics dashboard.
 
 ---
 
-# 2. PRODUCT DESIGN DIRECTION
+# 2. Primary UX Goals
 
-CityPulse should feel like a real urban intelligence platform rather than a generic AI SaaS dashboard.
+The Officials Web App should allow users to quickly understand:
 
-## Desired visual characteristics
+1. WHAT was detected?
+2. WHERE was it detected?
+3. WHEN did it happen?
+4. HOW serious is it?
+5. WHICH bus/camera detected it?
+6. WHAT other information supports the detection?
+7. HOW can the official investigate the issue?
+
+The UI should prioritize information clarity, geographic context,
+incident investigation, and operational awareness.
+
+---
+
+# 3. Visual Design Direction
+
+### Design Style
 
 - Modern
 - Professional
-- Urban
 - Data-driven
-- Intelligent
+- Urban intelligence
 - Clean
 - Minimal
-- Accessible
-- Responsive
-- Premium
+- Operational
 - Trustworthy
+- Responsive
 
-The interface should communicate:
-
-> City data → Visualization → Intelligence → Actionable understanding
-
-## Avoid
-
-Do NOT use:
+Avoid:
 
 - Excessive gradients
 - Excessive glassmorphism
-- Huge decorative elements
-- Excessive animations
-- Neon-heavy design
-- Excessive purple
+- Neon-heavy interfaces
+- Decorative animations
+- Huge visual elements
+- Generic AI dashboard templates
+- Unnecessary charts
 - Excessive rounded cards
-- Cluttered dashboards
-- Generic AI-generated dashboard patterns
-- Decorative UI that competes with important data
 
-Prioritize information hierarchy and usability over decoration.
+The design should resemble a modern civic/operations intelligence platform.
 
 ---
 
-# 3. CITYPULSE COLOR SYSTEM
+# 4. Color System
 
+Use a dark-first interface for the Officials Web App.
+
+### Base Colors
+
+--color-bg-primary: #0B1220;
+--color-bg-secondary: #111827;
+--color-bg-card: #172033;
+--color-bg-elevated: #1D293D;
+
+### Brand Colors
+
+--color-primary: #22D3EE;
+--color-secondary: #3B82F6;
+
+### Typography
+
+--color-text-primary: #F8FAFC;
+--color-text-secondary: #94A3B8;
+--color-text-muted: #64748B;
+
+### UI
+
+--color-border: #263449;
+
+### Status
+
+--color-success: #22C55E;
+--color-warning: #F59E0B;
+--color-high: #F97316;
+--color-critical: #EF4444;
+--color-info: #3B82F6;
+
+Use cyan/blue for the CityPulse identity.
+Use semantic colors only for status and severity.
+
+Do not use color alone to communicate severity.
+
+---
+
+# 5. Typography
+
+Primary font:
+
+Inter
+
+Fallback:
+
+Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+
+### Hierarchy
+
+Page heading:
+32–40px / 700
+
+Section heading:
+20–24px / 600
+
+Card heading:
+14–16px / 600
+
+Body:
+14–16px / 400
+
+Secondary:
+12–14px / 400
+
+Important metrics:
+28–36px / 700
+
+Prioritize readability over oversized typography.
+
+---
+
+# 6. Spacing & Components
+
+Use an 8px spacing system:
+
+4 / 8 / 12 / 16 / 24 / 32 / 48 / 64px
+
+### Cards
+
+- Padding: 20–24px
+- Radius: 12–16px
+- Border: 1px solid #263449
+
+### Buttons
+
+- Height: 40–44px
+- Radius: 8–10px
+- Horizontal padding: 16–20px
+
+Use subtle hover, active, disabled and focus states.
+
+---
+
+# 7. Application Structure
+
+The initial Officials Web App should contain:
+
+1. Dashboard
+2. Detection/Incident Feed
+3. Issue Details
+4. City Map
+5. Reports/Analytics
+6. About/System Information
+
+Keep navigation focused.
+
+Do not add unnecessary profile/settings/admin features during the
+initial prototype unless specifically required.
+
+---
+
+# 8. Officials Dashboard
+
+The dashboard is the main operational screen.
+
+### Header
+
+Display:
+
+- City / operating area
+- Current date/time
+- System status
+- Notifications/alerts
+- User area if authentication is added later
+
+### Main Overview
+
+Show high-level operational information such as:
+
+- Total detections
+- Active/high-severity issues
+- Recent detections
+- Areas with increased incidents
+- System/data status
+
+Avoid filling the dashboard with unrelated indicators.
+
+---
+
+# 9. Detection / Incident Feed
+
+Create a central feed of detection events.
+
+Each detection should clearly display:
+
+- Detection type
+- Severity
+- Location
+- Timestamp
+- Bus ID
+- Camera/source
+- Status
+- Confidence where applicable
+
+Example:
+
+DETECTION
+
+Road Obstruction
+
+High
+
+Central Zone
+
+Bus CP-104
+
+10:42 AM
+
+Confidence: 91%
+
+View Details →
+
+The feed should be easy to scan and filter.
+
+---
+
+# 10. Detection Filters
+
+Provide useful filtering controls.
+
+Possible filters:
+
+- Detection type
+- Severity
+- Location
+- Date/time
+- Bus ID
+- Status
+
+Example:
+
+[All Types] [All Severity] [Location] [Date] [Bus ID]
+
+Do not create excessive filtering controls.
+
+---
+
+# 11. Issue Details Page
+
+When a detection is selected, the user should enter a dedicated investigation view.
+
+Display:
+
+### Detection Information
+
+- Issue type
+- Severity
+- Confidence
+- Timestamp
+- Status
+
+### Source Information
+
+- Bus ID
+- Camera/source
+- Detection metadata
+
+### Location
+
+- Exact/approximate location
+- Map position
+- Nearby area information
+
+### Evidence
+
+Where available in the prototype:
+
+- Detection image/frame
+- Relevant visual evidence
+- Detection metadata
+
+### Supporting Information
+
+- Related detections
+- Historical occurrence
+- Similar nearby incidents
+
+Primary UX flow:
+
+Detection
+    ↓
+View Details
+    ↓
+Evidence
+    ↓
+Location
+    ↓
+Context
+    ↓
+Actionable Understanding
+
+---
+
+# 12. City Map
+
+The map is a major component of CityPulse.
+
+It should visually communicate:
+
+WHERE issues are occurring.
+
+The map should eventually support:
+
+- Detection markers
+- Incident clusters
+- Severity
+- Bus locations/routes where available
+- Issue categories
+- Geographic filtering
+
+Marker categories can include:
+
+- Road/traffic issues
+- Infrastructure issues
+- Public safety issues
+- Environmental issues
+- Other detected urban issues
+
+For the current frontend prototype, use mock/local map data
+or a placeholder if a real map integration has not yet been implemented.
+
+Design the component so a real map can be integrated later.
+
+---
+
+# 13. Map + Incident Interaction
+
+The map and detection feed should feel connected.
+
+Preferred interaction:
+
+User clicks detection
+    ↓
+Issue details open
+    ↓
+Map focuses on location
+
+Or:
+
+User selects map marker
+    ↓
+Detection summary appears
+    ↓
+View Details
+
+This creates a strong geographic investigation experience.
+
+---
+
+# 14. Reports & Analytics
+
+Analytics should support operational understanding rather than exist
+just to add charts.
+
+Useful visualizations:
+
+- Detection trends over time
+- Detection categories
+- Severity distribution
+- Area-wise detections
+- Bus-wise detections
+- Incident frequency
+- Historical comparison
+
+Prioritize charts that answer meaningful questions.
+
+Example:
+
+"Which areas are experiencing the most detections?"
+
+rather than showing charts without context.
+
+---
+
+# 15. AI / Intelligence Layer
+
+AI should be presented as an intelligence layer built on detected data.
+
+Avoid making CityPulse primarily look like a chatbot.
+
+AI-generated information can appear as:
+
+### Detection Insight
+
+"Multiple road obstruction detections were recorded in Central Zone
+during the evening period."
+
+Show:
+
+- Insight
+- Supporting detection data
+- Confidence
+- Time period
+- Location
+
+AI information should always be visually connected to the underlying data.
+
+Do not display unsupported or invented statistics.
+
+---
+
+# 16. System Status
+
+Because the system depends on bus-mounted cameras, on-board AI,
+local queues, internet connectivity and central processing, the UI
+should eventually communicate system/data health.
+
+Potential indicators:
+
+- Data connection
+- Last received detection
+- Active buses
+- Processing status
+- Data freshness
+
+For the prototype, these can use mock data.
+
+Do not create complex monitoring screens unless required.
+
+---
+
+# 17. Responsive Design
+
+The application must work on:
+
+- Desktop
+- Laptop
+- Tablet
+- Mobile
+
+### Desktop
+
+Prioritize:
+
+Map + detection feed + overview information.
+
+### Tablet
+
+Reduce columns while preserving map and detection visibility.
+
+### Mobile
+
+Stack:
+
+Overview
+↓
+Detection Feed
+↓
+Issue Details
+↓
+Map
+↓
+Analytics
+
+Controls should remain touch-friendly.
+
+---
+
+# 18. Accessibility
+
+Implement:
+
+- Semantic HTML
+- Keyboard navigation
+- Visible focus states
+- Accessible buttons
+- Proper labels
+- Sufficient contrast
+- Meaningful alt text
+- Text/icon + color for severity
+
+Do not rely only on colors for critical information.
+
+---
+
+# 19. Interaction Design
+
+Use subtle interactions:
+
+- Hover states
+- Active states
+- Focus states
+- Expand/collapse
+- Map marker interactions
+- Card selection
+- Smooth page transitions
+
+Recommended transition:
+
+150–250ms
+
+Avoid excessive animation.
+
+The application should feel responsive and operational.
+
+---
+
+# 20. Component System
+
+Create reusable components where appropriate:
+
+Navbar
+Sidebar
+Button
+Card
+StatCard
+DetectionCard
+SeverityBadge
+StatusIndicator
+MapContainer
+DetectionList
+FilterBar
+InsightCard
+ChartCard
+IssueDetails
+SectionHeader
+EmptyState
+LoadingState
+ErrorState
+
+Use props and reusable data structures.
+
+Do not duplicate UI markup unnecessarily.
+
+---
+
+# 21. Loading, Empty & Error States
+
+Every data-driven section should eventually support:
+
+### Loading
+
+Loading detections...
+
+### Empty
+
+No detections found.
+
+### Error
+
+Unable to load detection data.
+Try again.
+
+Never leave large blank sections without explanation.
+
+---
+
+# 22. Mock Data Strategy
+
+The frontend prototype should use structured mock data.
+
+Example:
+
+```javascript
+const detection = {
+  id: "DET-001",
+  type: "Road Obstruction",
+  severity: "High",
+  confidence: 91,
+  busId: "CP-104",
+  location: "Central Zone",
+  timestamp: "10:42 AM",
+  status: "Active"
+};
 Create a centralized color-token system using CSS variables.
 
 Do not scatter hard-coded colors throughout the codebase.
