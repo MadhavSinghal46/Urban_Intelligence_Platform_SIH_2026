@@ -3,18 +3,15 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { formatConfidence } from '../../data/mockData'
 
-const markerIcon = new L.Icon({
-  iconUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  iconRetinaUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
+function createMarkerIcon(color) {
+  return new L.DivIcon({
+    className: 'custom-map-marker',
+    html: `<span style="background:${color};width:14px;height:14px;border:2px solid rgba(255,255,255,0.9);display:block;border-radius:50%;box-shadow:0 2px 8px rgba(17,33,63,0.18);"></span>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10],
+  })
+}
 
 function CityMap({ events, compact = false }) {
   const validEvents = (events || []).filter(
@@ -35,21 +32,26 @@ function CityMap({ events, compact = false }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {validEvents.map((event) => (
-        <Marker key={event.event_id} position={[event.latitude, event.longitude]} icon={markerIcon}>
-          <Popup>
-            <div className="map-popup">
-              <strong>{event.event_id}</strong>
-              <div>Device: {event.device_id}</div>
-              <div>Confidence: {formatConfidence(event.confidence)}</div>
-              <div>Time: {new Date(event.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</div>
-              <div>
-                {event.latitude}, {event.longitude}
+      {validEvents.map((event) => {
+        const confidence = Number(event.confidence || 0)
+        const markerColor = confidence >= 0.9 ? '#d95d5d' : '#f28c5b'
+
+        return (
+          <Marker key={event.event_id} position={[event.latitude, event.longitude]} icon={createMarkerIcon(markerColor)}>
+            <Popup>
+              <div className="map-popup">
+                <strong>{event.event_id}</strong>
+                <div>Device: {event.device_id}</div>
+                <div>Confidence: {formatConfidence(event.confidence)}</div>
+                <div>Time: {new Date(event.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+                <div>
+                  {event.latitude}, {event.longitude}
+                </div>
               </div>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+            </Popup>
+          </Marker>
+        )
+      })}
     </MapContainer>
   )
 }

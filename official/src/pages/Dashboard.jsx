@@ -1,22 +1,103 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CityMap from '../components/map/CityMap'
 import { formatConfidence } from '../data/mockData'
 import { getEvents, getEventsCount, getHealth, resetDemoEvents } from '../services/api'
 
-function SummaryCard({ label, value, helper, tone = 'neutral' }) {
+function StatCard({ label, value, helper, tone = 'info' }) {
   return (
-    <div className="summary-card">
-      <div className="summary-header">
-        <span className={`status-dot status-${tone}`} />
-        <span>{label}</span>
+    <div className={`stat-card tone-${tone}`}>
+      <div className="stat-card-header">
+        <span className="stat-card-label">{label}</span>
+        <span className={`mini-indicator mini-${tone}`} />
       </div>
-      <div className="summary-value">{value}</div>
-      <div className="summary-helper">{helper}</div>
+      <div className="stat-card-value">{value}</div>
+      <div className="stat-card-helper">{helper}</div>
     </div>
   )
 }
 
+function DemoUtilities({ onReset, loading, disabled, error }) {
+  return (
+    <div className="demo-card">
+      <div className="demo-card-header">
+        <span className="demo-pill">Demo utilities</span>
+      </div>
+      <h3>Operations sandbox</h3>
+      <p>Use the reset utility to clear current demo data from the live server.</p>
+      <button type="button" className="demo-action" onClick={onReset} disabled={disabled || loading}>
+        {loading ? 'Resetting...' : 'Reset Demo Data'}
+      </button>
+      {error && <div className="demo-error">{error}</div>}
+    </div>
+  )
+}
+
+function RecentEventsCard({ events, loading, onViewAll }) {
+  const fallbackLetter = (value) => value ? value.charAt(0).toUpperCase() : 'P'
+
+  return (
+    <section className="panel recent-panel">
+      <div className="panel-header">
+        <div>
+          <p className="panel-kicker">Field feed</p>
+          <h2>Recent pothole events</h2>
+        </div>
+        <button type="button" className="view-all-button" onClick={onViewAll}>
+          View All →
+        </button>
+      </div>
+
+      <div className="recent-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Device</th>
+              <th>Confidence</th>
+              <th>Location</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="loading-row">Loading event data...</td>
+              </tr>
+            ) : events.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="empty-row">No events available.</td>
+              </tr>
+            ) : (
+              events.map((event) => (
+                <tr key={event.event_id}>
+                  <td className="event-id">{event.event_id}</td>
+                  <td>
+                    <div className="event-image-badge" aria-label={`Event image for ${event.event_id}`}>
+                      {fallbackLetter(event.event_id)}
+                    </div>
+                  </td>
+                  <td>{event.device_id}</td>
+                  <td>
+                    <span className={`confidence-badge ${Number(event.confidence) >= 0.9 ? 'high' : 'medium'}`}>
+                      {formatConfidence(event.confidence)}
+                    </span>
+                  </td>
+                  <td>{Number(event.latitude).toFixed(4)}, {Number(event.longitude).toFixed(4)}</td>
+                  <td>{new Date(event.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
+
 function Dashboard() {
+  const navigate = useNavigate()
   const [events, setEvents] = useState([])
   const [eventCount, setEventCount] = useState(0)
   const [serverStatus, setServerStatus] = useState('offline')
@@ -83,6 +164,7 @@ function Dashboard() {
       setEventCount(Number(countData?.count ?? allEvents.length))
       setServerStatus(healthData?.status === 'ok' ? 'online' : 'offline')
       setShowResetDialog(false)
+      setError('')
     } catch (resetErrorMessage) {
       const message = resetErrorMessage.message || 'Unable to reset demo data. Please try again.'
       setResetError(message)
@@ -132,23 +214,20 @@ function Dashboard() {
   ).slice(0, 5)
 
   return (
-    <div className="page-stack">
-      <div className="section-header">
+    <div className="page-stack dashboard-page">
+      <div className="dashboard-intro">
         <div>
-          <p className="eyebrow">Operational overview</p>
-          <h1>CityPulse dashboard</h1>
+          <p className="eyebrow">ROAD INTELLIGENCE PLATFORM</p>
+          <h1>Road Intelligence <span>Overview</span></h1>
+          <p className="intro-subtitle">Real-time pothole detection for safer, smarter and more livable Jaipur.</p>
         </div>
-        <div className="header-actions">
-          <button
-            type="button"
-            className="demo-action"
-            onClick={() => setShowResetDialog(true)}
-            disabled={loading || resetting}
-          >
-            {resetting ? 'Resetting...' : 'Reset Demo Data'}
-          </button>
-          <div className="pill success">{serverStatus === 'online' ? 'System online' : 'System offline'}</div>
-        </div>
+
+        <DemoUtilities
+          onReset={() => setShowResetDialog(true)}
+          loading={resetting}
+          disabled={loading || resetting}
+          error={resetError}
+        />
       </div>
 
       {error && <div className="error-state">{error}</div>}
@@ -172,79 +251,44 @@ function Dashboard() {
       )}
 
       <div className="summary-grid">
-        <SummaryCard
-          label="Total Pothole Events"
+        <StatCard
+          label="Pothole Events"
           value={loading ? 'Loading...' : eventCount}
           helper="Detected across city routes"
-          tone="info"
+          tone="blue"
         />
-        <SummaryCard
-          label="Devices / Buses"
+        <StatCard
+          label="Active Buses"
           value={loading ? 'Loading...' : deviceStats.length}
-          helper="Active sensing units"
-          tone="warning"
+          helper="Currently reporting"
+          tone="orange"
         />
-        <SummaryCard
-          label="Average Confidence"
+        <StatCard
+          label="Avg. Confidence"
           value={loading ? 'Loading...' : formatConfidence(averageConfidence)}
-          helper="Model confidence score"
-          tone="success"
+          helper="Across detected events"
+          tone="green"
         />
-        <SummaryCard
+        <StatCard
           label="Server Status"
           value={loading ? 'Checking...' : serverStatus === 'online' ? 'Operational' : 'Offline'}
           helper="Central data pipeline"
-          tone="critical"
+          tone="purple"
         />
       </div>
 
       <div className="dashboard-grid">
-        <section className="panel panel-large">
-          <div className="panel-header">
-            <h2>Recent events</h2>
-            <span className="panel-meta">Last 5 detections</span>
-          </div>
-          <div className="table-wrap compact-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Event ID</th>
-                  <th>Device ID</th>
-                  <th>Timestamp</th>
-                  <th>Confidence</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="5" className="loading-row">Loading event data...</td>
-                  </tr>
-                ) : recentEvents.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" className="empty-row">No events available.</td>
-                  </tr>
-                ) : (
-                  recentEvents.map((event) => (
-                    <tr key={event.event_id}>
-                      <td>{event.event_id}</td>
-                      <td>{event.device_id}</td>
-                      <td>{new Date(event.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</td>
-                      <td>{formatConfidence(event.confidence)}</td>
-                      <td>{event.latitude.toFixed(4)}, {event.longitude.toFixed(4)}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <RecentEventsCard events={recentEvents} loading={loading} onViewAll={() => navigate('/events')} />
 
-        <section className="panel">
+        <section className="panel map-panel">
           <div className="panel-header">
-            <h2>Map preview</h2>
-            <span className="panel-meta">Jaipur coverage</span>
+            <div>
+              <p className="panel-kicker">Coverage map</p>
+              <h2>City map</h2>
+            </div>
+            <span className="panel-meta">{validEvents.length} active points</span>
           </div>
+
           <div className="map-preview">
             {loading ? (
               <div className="loading-state">Loading map...</div>
@@ -252,42 +296,22 @@ function Dashboard() {
               <CityMap events={validEvents} compact />
             )}
           </div>
+
+          <div className="map-legend">
+            <span><i className="legend-dot high" />High Confidence</span>
+            <span><i className="legend-dot medium" />Medium Confidence</span>
+            <span><i className="legend-dot bus" />Active Bus</span>
+          </div>
         </section>
       </div>
 
-      <section className="panel">
-        <div className="panel-header">
-          <h2>Device overview</h2>
-          <span className="panel-meta">Detection counts</span>
+      <div className="municipal-banner">
+        <div>
+          <div className="banner-kicker">Together for a Safer Jaipur</div>
+          <div className="banner-title">AI for cleaner roads. A smarter, safer city for everyone.</div>
         </div>
-        <div className="device-overview-list">
-          {loading ? (
-            <div className="loading-state">Loading device data...</div>
-          ) : deviceStats.length === 0 ? (
-            <div className="empty-state">No devices available.</div>
-          ) : (
-            deviceStats.map((device) => (
-              <div key={device.device_id} className="device-overview-item">
-                <div>
-                  <div className="device-name">{device.device_id}</div>
-                  <div className="device-subname">{device.busName}</div>
-                </div>
-                <div>
-                  <span className="metric-label">Detections</span>
-                  <strong>{device.potholes}</strong>
-                </div>
-                <div>
-                  <span className="metric-label">Avg confidence</span>
-                  <strong>{formatConfidence(device.averageConfidence)}</strong>
-                </div>
-                <span className={`status-pill ${device.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {device.status}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        <div className="banner-tag">Jaipur municipal operations</div>
+      </div>
     </div>
   )
 }
