@@ -54,6 +54,12 @@ export async function getEvents({ deviceId, minConfidence } = {}) {
   return Array.isArray(response?.events) ? response.events : []
 }
 
+export async function resetDemoEvents() {
+  return fetchJson('/events', {
+    method: 'DELETE',
+  })
+}
+
 export async function getEventById(eventId) {
   return fetchJson(`/events/${eventId}`)
 }

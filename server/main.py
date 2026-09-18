@@ -117,6 +117,16 @@ def get_events(
     }
 
 
+@app.delete("/events")
+def reset_events():
+    deleted_count = database.clear_all_events()
+
+    return {
+        "status": "reset",
+        "deleted_count": deleted_count
+    }
+
+
 @app.get("/events/{event_id}")
 def get_event(event_id: str):
 

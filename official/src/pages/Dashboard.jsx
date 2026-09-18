@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import CityMap from '../components/map/CityMap'
 import { formatConfidence } from '../data/mockData'
-import { getEvents, getEventsCount, getHealth } from '../services/api'
+import { getEvents, getEventsCount, getHealth, resetDemoEvents } from '../services/api'
 
 function SummaryCard({ label, value, helper, tone = 'neutral' }) {
   return (
@@ -22,46 +22,75 @@ function Dashboard() {
   const [serverStatus, setServerStatus] = useState('offline')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showResetDialog, setShowResetDialog] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [resetError, setResetError] = useState('')
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true)
+      setError('')
+
+      const [eventData, countData, healthData] = await Promise.all([
+        getEvents(),
+        getEventsCount(),
+        getHealth(),
+      ])
+
+      const allEvents = Array.isArray(eventData) ? eventData : []
+      setEvents(allEvents)
+      setEventCount(Number(countData?.count ?? allEvents.length))
+      setServerStatus(healthData?.status === 'ok' ? 'online' : 'offline')
+    } catch (loadError) {
+      setEvents([])
+      setEventCount(0)
+      setServerStatus('offline')
+      setError(loadError.message || 'Unable to load dashboard data.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let isMounted = true
 
-    const loadDashboard = async () => {
-      try {
-        setLoading(true)
-        setError('')
-
-        const [eventData, countData, healthData] = await Promise.all([
-          getEvents(),
-          getEventsCount(),
-          getHealth(),
-        ])
-
-        if (!isMounted) return
-
-        const allEvents = Array.isArray(eventData) ? eventData : []
-        setEvents(allEvents)
-        setEventCount(Number(countData?.count ?? allEvents.length))
-        setServerStatus(healthData?.status === 'ok' ? 'online' : 'offline')
-      } catch (loadError) {
-        if (!isMounted) return
-        setEvents([])
-        setEventCount(0)
-        setServerStatus('offline')
-        setError(loadError.message || 'Unable to load dashboard data.')
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
-      }
+    const runLoad = async () => {
+      if (!isMounted) return
+      await loadDashboard()
     }
 
-    loadDashboard()
+    runLoad()
 
     return () => {
       isMounted = false
     }
   }, [])
+
+  const handleResetDemoData = async () => {
+    setResetting(true)
+    setResetError('')
+
+    try {
+      await resetDemoEvents()
+      const [eventData, countData, healthData] = await Promise.all([
+        getEvents(),
+        getEventsCount(),
+        getHealth(),
+      ])
+
+      const allEvents = Array.isArray(eventData) ? eventData : []
+      setEvents(allEvents)
+      setEventCount(Number(countData?.count ?? allEvents.length))
+      setServerStatus(healthData?.status === 'ok' ? 'online' : 'offline')
+      setShowResetDialog(false)
+    } catch (resetErrorMessage) {
+      const message = resetErrorMessage.message || 'Unable to reset demo data. Please try again.'
+      setResetError(message)
+      setError(message)
+    } finally {
+      setResetting(false)
+    }
+  }
 
   const validEvents = useMemo(
     () => events.filter((event) => Number.isFinite(event.latitude) && Number.isFinite(event.longitude)),
@@ -109,10 +138,38 @@ function Dashboard() {
           <p className="eyebrow">Operational overview</p>
           <h1>CityPulse dashboard</h1>
         </div>
-        <div className="pill success">{serverStatus === 'online' ? 'System online' : 'System offline'}</div>
+        <div className="header-actions">
+          <button
+            type="button"
+            className="demo-action"
+            onClick={() => setShowResetDialog(true)}
+            disabled={loading || resetting}
+          >
+            {resetting ? 'Resetting...' : 'Reset Demo Data'}
+          </button>
+          <div className="pill success">{serverStatus === 'online' ? 'System online' : 'System offline'}</div>
+        </div>
       </div>
 
       {error && <div className="error-state">{error}</div>}
+
+      {showResetDialog && (
+        <div className="modal-backdrop" onClick={() => setShowResetDialog(false)}>
+          <div className="confirmation-modal" onClick={(event) => event.stopPropagation()}>
+            <h3>Reset demo data</h3>
+            <p>Are you sure? This will remove all current demo events.</p>
+            {resetError && <div className="error-state inline-error">{resetError}</div>}
+            <div className="modal-actions">
+              <button type="button" className="secondary-button" onClick={() => setShowResetDialog(false)}>
+                Cancel
+              </button>
+              <button type="button" className="danger-button" onClick={handleResetDemoData} disabled={resetting}>
+                {resetting ? 'Resetting...' : 'Reset Data'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="summary-grid">
         <SummaryCard

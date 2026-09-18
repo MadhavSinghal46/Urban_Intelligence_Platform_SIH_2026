@@ -66,3 +66,13 @@ class ServerDatabase:
         )
 
         return cursor.fetchone()[0]
+
+    def clear_all_events(self):
+
+        cursor = self.connection.execute(
+            "DELETE FROM pothole_events"
+        )
+
+        self.connection.commit()
+
+        return cursor.rowcount
